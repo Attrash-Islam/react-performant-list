@@ -1,0 +1,20 @@
+{
+  "extends": ["tslint:recommended", "tslint-react"],
+  "rules": {
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "jsx-no-multiline-js": false,
+    "no-console": false,
+    "jsx-no-lambda": false,
+    "max-classes-per-file": false,
+    "prefer-const": false,
+    "jsx-boolean-value": false,
+    "switch-default": true,
+    "newline-before-return": true,
+    "no-duplicate-imports": true,
+    "no-require-imports": true,
+    "arrow-return-shorthand": [true, "multiline"],
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "indent": [true, "spaces", 2]
+  }
+}

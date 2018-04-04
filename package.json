@@ -1,0 +1,25 @@
+{
+  "name": "react-performant-list",
+  "version": "1.0.0",
+  "description": "react-performant-list",
+  "scripts": {
+    "build": "webpack --config webpack.config.js --output-library-target=\"umd\" && webpack --config webpack.prod.js --output-library-target=\"umd\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Islam Attrash <isattrash@gmail.com>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "16.1.0",
+    "@types/react-dom": "16.0.4",
+    "express": "4.14.0",
+    "react": "16.1.0",
+    "react-dom": "16.1.0",
+    "ts-loader": "3.1.1",
+    "tslint": "5.9.1",
+    "tslint-react": "3.4.0",
+    "typescript": "2.5.3",
+    "uglifyjs-webpack-plugin": "1.0.1",
+    "webpack": "2.6.1"
+  }
+}
