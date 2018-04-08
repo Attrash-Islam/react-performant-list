@@ -34,6 +34,7 @@ class TableCell extends React.Component<{
           height: "40px",
         }}
         className="more than one class bro"
+        title={this.props.value}
       >
         {this.props.value}
       </td>
@@ -97,8 +98,8 @@ class Hello extends React.Component<{}, {
           >
             <tbody>
               {
-                this.state.tableList.map(x => (
-                  <tr key={x.id}>
+                this.state.tableList.map((x, index) => (
+                  <tr key={x.id} className={`tr_${index}`}>
                     <TableCell value={x.column1} />
                     <TableCell value={x.column2} />
                     <TableCell value={x.column3} />

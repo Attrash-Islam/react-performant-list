@@ -35,6 +35,7 @@ class TableCell extends React.Component<{
           height: "40px",
         }}
         className="more than one class bro"
+        title={this.props.value}
       >
         {this.props.value}
       </td>
@@ -108,9 +109,9 @@ class Hello extends React.Component<{}, {
                       <PerformantTableRow.Consumer
                         $index={index}
                         key={x.id}
-                        isVisible={isVisibleRow}
+                        isVisible={isVisibleRow(index)}
                       >
-                      <tr key={x.id} className={`tr_${index}`}>
+                      <tr className={`tr_${index}`}>
                         <TableCell value={x.column1} />
                         <TableCell value={x.column2} />
                         <TableCell value={x.column3} />

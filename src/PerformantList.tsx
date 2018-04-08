@@ -14,7 +14,7 @@ const statistics = {
 
 interface IPerformantTableRowPropsConsumer {
   $index: number;
-  isVisible($index): boolean;
+  isVisible: boolean;
 }
 
 interface IPerformantTableRowPropsProvider {
@@ -50,6 +50,8 @@ export class PerformantTableRow extends React.Component {
         if (root) {
           this.root = root;
           this.root.addEventListener("scroll", this.onScroll);
+        } else {
+          console.error("Can't find the scrollable parent");
         }
 
         if (!this.rowHeight) {
@@ -106,10 +108,6 @@ export class PerformantTableRow extends React.Component {
         scrollTop,
       } = this.root;
 
-      const {
-        wrappedSelectorId,
-      } = this.props;
-
       if (
         Math.abs(scrollTop - this.lastScrollTop) > this.rowHeight * this.props.ChunkRowsCount
       ) {
@@ -134,6 +132,8 @@ export class PerformantTableRow extends React.Component {
         ChunkRowsCount,
       } = this.props;
 
+      consoleInfo(`Calculating visibleRows with scrollTop: ${scrollTop}`);
+
       const firstElementPosition = parseInt(
         `${scrollTop / this.rowHeight}`,
         10,
@@ -149,7 +149,7 @@ export class PerformantTableRow extends React.Component {
   public static Consumer = class extends React.Component<IPerformantTableRowPropsConsumer, {}> {
 
     public shouldComponentUpdate(nextProps: IPerformantTableRowPropsConsumer) {
-      return nextProps.isVisible(nextProps.$index);
+      return nextProps.isVisible;
     }
 
     public render() {
