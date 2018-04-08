@@ -59,8 +59,6 @@ export class PerformantTableRow extends React.Component {
           if (firstRow) {
             this.rowHeight = firstRow.clientHeight;
             consoleInfo(`Calculated rowHeight is: ${this.rowHeight}`);
-          } else {
-            console.error(`Can't find #${wrappedSelectorId} ${itemSelector}`);
           }
         }
 

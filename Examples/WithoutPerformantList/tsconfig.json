@@ -2,6 +2,7 @@
     "compilerOptions": {
         "target": "es5",
         "sourceMap": true,
+        "strictNullChecks": false,
         "lib": [
             "dom",
             "es5",

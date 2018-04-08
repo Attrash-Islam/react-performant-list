@@ -1,3 +1,4 @@
 {
-  "tslint.alwaysShowRuleFailuresAsWarnings": true
+  "tslint.alwaysShowRuleFailuresAsWarnings": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
