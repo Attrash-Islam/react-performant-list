@@ -1,17 +1,5 @@
 import * as React from "react";
 
-const consoleInfo = (msg: string) => {
-  console.log(
-    `%c ${msg}`,
-    "color: #0079f4",
-  );
-};
-
-const statistics = {
-  rendered: 0,
-  saved: 0,
-};
-
 interface IPerformantScrollableListConsumerProps {
   isVisible: boolean;
 }
@@ -20,6 +8,7 @@ interface IPerformantScrollableListProviderProps {
   wrappedSelectorId: string;
   itemSelector: string;
   ChunkRowsCount: number;
+  rebaseOnScrollRowCounts?: number;
   render(object: {isVisibleRow(index: number): boolean}): JSX.Element;
   getScrollableParent?(wrappedSelectorId: string): HTMLElement;
 }
@@ -53,17 +42,30 @@ export class PerformantScrollableList extends React.Component {
         } = this.props;
 
         const node = document.querySelector(`#${wrappedSelectorId}`);
-        const root = getScrollableParent ?
-          getScrollableParent(wrappedSelectorId) : PerformantScrollableList.getScrollableParent(node);
+        let root;
+        if (getScrollableParent) {
+          try {
+            root = getScrollableParent(wrappedSelectorId);
+          } catch (e) {
+            console.error(
+              `PerformantScrollableList.Provider: getScrollableParent prop throw exception.
+              Rollback to PerformantScrollableList.Provider built-in scrollable parent finder`,
+              e,
+            );
+            root = PerformantScrollableList.getScrollableParent(node);
+          }
+        } else {
+          root = PerformantScrollableList.getScrollableParent(node);
+        }
+
         if (root) {
           this.root = root;
           this.root.addEventListener("scroll", this.onScroll);
         } else {
-          console.error("Can't find the scrollable parent");
+          console.error("PerformantScrollableList.Provider: Can't find the scrollable parent");
         }
 
         this.visibleRows = this.getVisibleRowsIndexes();
-        consoleInfo(`Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`);
       }, 0);
     }
 
@@ -75,12 +77,8 @@ export class PerformantScrollableList extends React.Component {
       return this.props.render({
         isVisibleRow: (index: number) => {
           if (index >= this.visibleRows.from && index <= this.visibleRows.to) {
-            statistics.rendered++;
-
             return true;
           } else {
-            statistics.saved++;
-
             return false;
           }
         },
@@ -94,14 +92,18 @@ export class PerformantScrollableList extends React.Component {
     }
 
     public componentDidUpdate() {
+      const oldVisibleRows = {...this.visibleRows};
       this.visibleRows = this.getVisibleRowsIndexes();
-      consoleInfo(`NEW Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`);
-
-      consoleInfo(`Rendered: ${statistics.rendered}`);
-      consoleInfo(`Skipped Rendering: ${statistics.saved}`);
-
-      statistics.rendered = 0;
-      statistics.saved = 0;
+      if (process.env.NODE_ENV !== "production") {
+        const stringifyOldVisible = JSON.stringify(oldVisibleRows);
+        const stringifyNewVisible = JSON.stringify(this.visibleRows);
+        if (stringifyOldVisible !== stringifyNewVisible) {
+          console.log(
+            `%c PerformantScrollableList.Provider: NEW Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`,
+            "color: #00aa4f",
+          );
+        }
+      }
     }
 
     private get rowHeight() {
@@ -113,7 +115,17 @@ export class PerformantScrollableList extends React.Component {
         const firstRow = document.querySelector(`#${wrappedSelectorId} ${itemSelector}`);
         if (firstRow) {
           this._rowHeight = firstRow.clientHeight;
-          consoleInfo(`Calculated rowHeight is: ${this.rowHeight}`);
+        }
+
+        if (process.env.NODE_ENV !== "production") {
+          if (!this._rowHeight) {
+            console.warn("PerformantScrollableList.Provider: didn't calculated yet the row height");
+          } else {
+            console.log(
+              `%c PerformantScrollableList.Provider: successfully calculated the row height. ${this._rowHeight}`,
+              "color: #00aa4f",
+            );
+          }
         }
       }
 
@@ -124,12 +136,17 @@ export class PerformantScrollableList extends React.Component {
       const {
         scrollTop,
       } = this.root;
+      const {
+        ChunkRowsCount,
+        rebaseOnScrollRowCounts,
+      } = this.props;
+
+      const rebaseDeviation = this.rowHeight * (rebaseOnScrollRowCounts || ChunkRowsCount);
 
       if (
-        Math.abs(scrollTop - this.lastScrollTop) > this.rowHeight * (this.props.ChunkRowsCount / 2)
+        Math.abs(scrollTop - this.lastScrollTop) > rebaseDeviation
       ) {
         this.lastScrollTop = scrollTop;
-        consoleInfo(`FORCE RENDERING`);
         this.forceUpdate();
       }
     }
