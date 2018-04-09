@@ -13,7 +13,6 @@ const statistics = {
 };
 
 interface IPerformantScrollableListConsumerProps {
-  $index: number;
   isVisible: boolean;
 }
 

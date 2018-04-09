@@ -107,7 +107,6 @@ class Hello extends React.Component<{}, {
                   {
                     this.state.tableList.map((x, index) => (
                       <PerformantScrollableList.Consumer
-                        $index={index}
                         key={x.id}
                         isVisible={isVisibleRow(index)}
                       >
