@@ -4,6 +4,9 @@
   "description": "react-performant-scrollable-list",
   "scripts": {
     "build": "webpack --config webpack.config.js --output-library-target=\"umd\" && webpack --config webpack.prod.js --output-library-target=\"umd\"",
+    "tslint": "tslint --fix -c tslint.json 'src/**/*.tsx'",
+    "validate-build": "npm run tslint && npm run build",
+    "prepublish": "npm run validate-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Islam Attrash <isattrash@gmail.com>",

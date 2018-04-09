@@ -234,3 +234,5 @@ export class PerformantScrollableList extends React.Component {
   }
 
 }
+
+export default PerformantScrollableList;
