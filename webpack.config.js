@@ -1,7 +1,7 @@
 var webpack = require('webpack');
 
 module.exports = {
-	entry: './src/PerformantList.tsx',
+	entry: './src/PerformantScrollableList.tsx',
 	devtool: 'inline-source-map',
 	output: {
     filename: 'dist/index.debug.js',

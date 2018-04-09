@@ -1,6 +1,6 @@
 import * as React from "react";
 import {render} from "react-dom";
-import {PerformantTableRow} from "../../src/PerformantList";
+import {PerformantScrollableList} from "../../src/PerformantScrollableList";
 
 const updateEveryInSecond = 5;
 
@@ -91,11 +91,11 @@ class Hello extends React.Component<{}, {
             height: "50%",
           }}
         >
-          <h1>Test</h1>
-          <PerformantTableRow.Provider
+          <h1 style={{ marginTop: "120px"}}>Test</h1>
+          <PerformantScrollableList.Provider
             wrappedSelectorId="myTable"
             itemSelector="tr"
-            ChunkRowsCount={20}
+            ChunkRowsCount={10}
             render={({isVisibleRow}) => (
               <table
                 id="myTable"
@@ -106,7 +106,7 @@ class Hello extends React.Component<{}, {
                 <tbody>
                   {
                     this.state.tableList.map((x, index) => (
-                      <PerformantTableRow.Consumer
+                      <PerformantScrollableList.Consumer
                         $index={index}
                         key={x.id}
                         isVisible={isVisibleRow(index)}
@@ -123,7 +123,7 @@ class Hello extends React.Component<{}, {
                         <TableCell value={x.column9} />
                         <TableCell value={x.column10} />
                       </tr>
-                      </PerformantTableRow.Consumer>
+                      </PerformantScrollableList.Consumer>
                     ))
                   }
                 </tbody>

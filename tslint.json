@@ -9,6 +9,7 @@
     "max-classes-per-file": false,
     "prefer-const": false,
     "jsx-boolean-value": false,
+    "variable-name": false,
     "switch-default": true,
     "newline-before-return": true,
     "no-duplicate-imports": true,

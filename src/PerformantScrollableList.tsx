@@ -12,25 +12,27 @@ const statistics = {
   saved: 0,
 };
 
-interface IPerformantTableRowPropsConsumer {
+interface IPerformantScrollableListConsumerProps {
   $index: number;
   isVisible: boolean;
 }
 
-interface IPerformantTableRowPropsProvider {
+interface IPerformantScrollableListProviderProps {
   wrappedSelectorId: string;
   itemSelector: string;
   ChunkRowsCount: number;
   render(object: {isVisibleRow(index: number): boolean}): JSX.Element;
+  getScrollableParent?(wrappedSelectorId: string): HTMLElement;
 }
 
-export class PerformantTableRow extends React.Component {
-  public static Provider = class extends React.Component<IPerformantTableRowPropsProvider, {}> {
+export class PerformantScrollableList extends React.Component {
+  public static Provider = class extends React.Component<IPerformantScrollableListProviderProps, {}> {
 
     private root: HTMLElement;
-    private rowHeight: number = 0;
+    private _rowHeight: number = 0;
     private lastScrollTop = 0;
-    private visibleRows: {
+    private safeScroll: number = 0;
+    private SHOW_ALL_ROWS: {
       from: number,
       to: number,
     } = {
@@ -38,28 +40,27 @@ export class PerformantTableRow extends React.Component {
       to: Number.MAX_VALUE,
     };
 
+    private visibleRows: {
+      from: number,
+      to: number,
+    } = {...this.SHOW_ALL_ROWS};
+
     public componentDidMount() {
       setTimeout(() => {
         const {
           wrappedSelectorId,
           itemSelector,
+          getScrollableParent,
         } = this.props;
 
         const node = document.querySelector(`#${wrappedSelectorId}`);
-        const root = PerformantTableRow.getScrollableParent(node);
+        const root = getScrollableParent ?
+          getScrollableParent(wrappedSelectorId) : PerformantScrollableList.getScrollableParent(node);
         if (root) {
           this.root = root;
           this.root.addEventListener("scroll", this.onScroll);
         } else {
           console.error("Can't find the scrollable parent");
-        }
-
-        if (!this.rowHeight) {
-          const firstRow = document.querySelector(`#${wrappedSelectorId} ${itemSelector}`);
-          if (firstRow) {
-            this.rowHeight = firstRow.clientHeight;
-            consoleInfo(`Calculated rowHeight is: ${this.rowHeight}`);
-          }
         }
 
         this.visibleRows = this.getVisibleRowsIndexes();
@@ -94,11 +95,30 @@ export class PerformantTableRow extends React.Component {
     }
 
     public componentDidUpdate() {
+      this.visibleRows = this.getVisibleRowsIndexes();
+      consoleInfo(`NEW Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`);
+
       consoleInfo(`Rendered: ${statistics.rendered}`);
       consoleInfo(`Skipped Rendering: ${statistics.saved}`);
 
       statistics.rendered = 0;
       statistics.saved = 0;
+    }
+
+    private get rowHeight() {
+      if (!this._rowHeight) {
+        const {
+          wrappedSelectorId,
+          itemSelector,
+        } = this.props;
+        const firstRow = document.querySelector(`#${wrappedSelectorId} ${itemSelector}`);
+        if (firstRow) {
+          this._rowHeight = firstRow.clientHeight;
+          consoleInfo(`Calculated rowHeight is: ${this.rowHeight}`);
+        }
+      }
+
+      return this._rowHeight;
     }
 
     private onScroll = () => {
@@ -107,11 +127,9 @@ export class PerformantTableRow extends React.Component {
       } = this.root;
 
       if (
-        Math.abs(scrollTop - this.lastScrollTop) > this.rowHeight * this.props.ChunkRowsCount
+        Math.abs(scrollTop - this.lastScrollTop) > this.rowHeight * (this.props.ChunkRowsCount / 2)
       ) {
         this.lastScrollTop = scrollTop;
-        this.visibleRows = this.getVisibleRowsIndexes();
-        consoleInfo(`NEW Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`);
         consoleInfo(`FORCE RENDERING`);
         this.forceUpdate();
       }
@@ -122,31 +140,46 @@ export class PerformantTableRow extends React.Component {
       to: number;
     } => {
 
-      const {
-        scrollTop,
-      } = this.root;
+      if (!this.rowHeight) {
+        return {
+          ...this.SHOW_ALL_ROWS,
+        };
+      } else {
+        const {
+          wrappedSelectorId,
+          itemSelector,
+          ChunkRowsCount,
+        } = this.props;
+        const rows = document.querySelectorAll(`#${wrappedSelectorId} ${itemSelector}`);
+        let from = null;
+        let to = null;
+        for (let i = 0; i < rows.length; i++) {
+          let row = rows[i];
+          let position = row.getBoundingClientRect().top + this.rowHeight;
+          if (position >= 0 && position <= this.root.clientHeight) {
+            if (from === null) {
+              from = i;
+            }
+          } else if (from !== null) {
+            to = i - 1;
+          }
 
-      const {
-        ChunkRowsCount,
-      } = this.props;
+          if ([from, to].filter(x => x !== null).length === 2) {
+            break;
+          }
+        }
 
-      consoleInfo(`Calculating visibleRows with scrollTop: ${scrollTop}`);
-
-      const firstElementPosition = parseInt(
-        `${scrollTop / this.rowHeight}`,
-        10,
-      );
-
-      return {
-        from: firstElementPosition - ChunkRowsCount,
-        to: firstElementPosition + ChunkRowsCount * 2,
-      };
+        return {
+          from: from - ChunkRowsCount,
+          to: to + ChunkRowsCount,
+        };
+      }
     }
   };
 
-  public static Consumer = class extends React.Component<IPerformantTableRowPropsConsumer, {}> {
+  public static Consumer = class extends React.Component<IPerformantScrollableListConsumerProps, {}> {
 
-    public shouldComponentUpdate(nextProps: IPerformantTableRowPropsConsumer) {
+    public shouldComponentUpdate(nextProps: IPerformantScrollableListConsumerProps) {
       return nextProps.isVisible;
     }
 
@@ -159,7 +192,7 @@ export class PerformantTableRow extends React.Component {
   public static getScrollableParent(node): HTMLElement | null {
     const isElement = node instanceof HTMLElement;
     const overflowY = isElement && window.getComputedStyle(node).overflowY;
-    const isScrollable = overflowY !== "visible" && overflowY !== "hidden";
+    const isScrollable = overflowY !== "visible";
 
     if (!node) {
       return null;
@@ -167,7 +200,7 @@ export class PerformantTableRow extends React.Component {
       return node;
     }
 
-    return PerformantTableRow.getScrollableParent(node.parentNode) || document.body;
+    return PerformantScrollableList.getScrollableParent(node.parentNode) || document.body;
   }
 
 }
