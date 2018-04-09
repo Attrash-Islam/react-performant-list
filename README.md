@@ -20,23 +20,6 @@ Seems like having that much of components into the React reconciliation is makin
 npm i -S react-performant-scrollable-list 
 ```
 
-# API Interfaces
-
-```ts
-interface IPerformantScrollableListConsumerProps {
-  isVisible: boolean;
-}
-
-interface IPerformantScrollableListProviderProps {
-  wrappedSelectorId: string;
-  itemSelector: string;
-  ChunkRowsCount: number;
-  rebaseOnScrollRowCounts?: number;
-  render(object: {isVisibleRow(index: number): boolean}): JSX.Element;
-  getScrollableParent?(wrappedSelectorId: string): HTMLElement;
-}
-```
-
 # Usage
 ```js
 // You can use default import, I prefered the named one
@@ -100,6 +83,23 @@ import { PerformantScrollableList } from "react-performant-scrollable-list";
   
 ```
 See Examples folder.
+
+# API Interfaces
+
+```ts
+interface IPerformantScrollableListConsumerProps {
+  isVisible: boolean;
+}
+
+interface IPerformantScrollableListProviderProps {
+  wrappedSelectorId: string;
+  itemSelector: string;
+  ChunkRowsCount: number;
+  rebaseOnScrollRowCounts?: number;
+  render(object: {isVisibleRow(index: number): boolean}): JSX.Element;
+  getScrollableParent?(wrappedSelectorId: string): HTMLElement;
+}
+```
 
 # Limitations 
 Only works on rows with the same height (static not dynamic) so if your rows height is not equal consider using another "windowing" library.
