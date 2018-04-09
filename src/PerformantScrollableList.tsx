@@ -55,6 +55,14 @@ export class PerformantScrollableList extends React.Component {
             root = PerformantScrollableList.getScrollableParent(node);
           }
         } else {
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(
+              `PerformantScrollableList.Provider: Consider using getScrollableParent prop if you are using custom
+              scroller that is not making the use of "overflow: scroll". e.g. slimScroll is implementing the scrollable
+              area in special mode where the scrollable is "overflow: hidden" which the built-in scrollable parent
+              finder will not find`,
+            );
+          }
           root = PerformantScrollableList.getScrollableParent(node);
         }
 
@@ -66,6 +74,12 @@ export class PerformantScrollableList extends React.Component {
         }
 
         this.visibleRows = this.getVisibleRowsIndexes();
+        if (process.env.NODE_ENV !== "production") {
+          console.log(
+            `%c PerformantScrollableList.Provider: calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`,
+            "color: #00aa4f",
+          );
+        }
       }, 0);
     }
 
@@ -208,7 +222,7 @@ export class PerformantScrollableList extends React.Component {
   public static getScrollableParent(node): HTMLElement | null {
     const isElement = node instanceof HTMLElement;
     const overflowY = isElement && window.getComputedStyle(node).overflowY;
-    const isScrollable = overflowY !== "visible";
+    const isScrollable = overflowY !== "visible" && overflowY !== "hidden";
 
     if (!node) {
       return null;
