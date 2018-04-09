@@ -88,15 +88,28 @@ See Examples folder.
 
 ```ts
 interface IPerformantScrollableListConsumerProps {
+  // This prop is passed to each Table Cell based on Provider.isVisibleRow render-prop output
   isVisible: boolean;
 }
 
 interface IPerformantScrollableListProviderProps {
+  // The wrapped selector ID below the Provider
   wrappedSelectorId: string;
+  // The item row selector (e.g. tr, li, .my-row-class, etc.)
   itemSelector: string;
+  // Chunk count to be updated [Mainly the visible chunk]
   ChunkRowsCount: number;
+  // Rebase on scroll row counts - When freezing the values user may watch older values that not make since (e.g. sorting)
+  // while scrolling up for the already rendered values, so once he pass a speicfic count of rows the Proiver will
+  // forceUpdate the values to fetch the last correct value kept in the inner state
   rebaseOnScrollRowCounts?: number;
+  // a render-prop to inject the Consumers below that provider, which isVisibleRow(index) will be given to 
+  // each consumer to decide whether it's visible or not in the scrollable area
   render(object: {isVisibleRow(index: number): boolean}): JSX.Element;
+  // getScrollableParent is implemented by default, but for those who is using some special scroller they may have
+  // some issue depending on the built-in implementation. e.g. I use slim-scroll in various projects and it's 
+  // scrollable area is not overflowed as "scroll"! but it's implemented in another way that the scrollable area
+  // will be overflowed as "hidden", so this prop can give the user to implement that in some cases where needed
   getScrollableParent?(wrappedSelectorId: string): HTMLElement;
 }
 ```
