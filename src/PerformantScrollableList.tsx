@@ -170,7 +170,7 @@ export class PerformantScrollableList extends React.Component {
       to: number;
     } => {
 
-      if (!this.rowHeight) {
+      if (!this.rowHeight || !this.root) {
         return {
           ...this.SHOW_ALL_ROWS,
         };
