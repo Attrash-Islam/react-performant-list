@@ -15,6 +15,13 @@ Seems like having that much of components into the React reconciliation is makin
 
 - Reduced the processing time fair enough and raised the performance
 
+# Performance Benchmarks
+### Without PerformantList including (80) rows in total with X4 slower CPU
+<img src="https://github.com/Attrash-Islam/assets/raw/master/withoutPerformantList_80_rows_4x_slowerCPU.png" />
+
+### With PerformantList including 360 rows in total with X4 slower CPU
+<img src="https://github.com/Attrash-Islam/assets/raw/master/WithPerformantList_360_rows_4x_slowerCPU.png" />
+
 # Install
 ```js
 npm i -S react-performant-scrollable-list 
