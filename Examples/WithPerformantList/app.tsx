@@ -95,7 +95,6 @@ class Hello extends React.Component<{}, {
           <PerformantScrollableList.Provider
             wrappedSelectorId="myTable"
             itemSelector="tr"
-            ChunkRowsCount={10}
             render={({isVisibleRow}) => (
               <table
                 id="myTable"

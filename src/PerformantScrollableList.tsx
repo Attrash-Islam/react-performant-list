@@ -7,7 +7,6 @@ interface IPerformantScrollableListConsumerProps {
 interface IPerformantScrollableListProviderProps {
   wrappedSelectorId: string;
   itemSelector: string;
-  ChunkRowsCount: number;
   rebaseOnScrollRowCounts?: number;
   render(object: {isVisibleRow(index: number): boolean}): JSX.Element;
   getScrollableParent?(wrappedSelectorId: string): HTMLElement;
@@ -15,7 +14,7 @@ interface IPerformantScrollableListProviderProps {
 
 export class PerformantScrollableList extends React.Component {
   public static Provider = class extends React.Component<IPerformantScrollableListProviderProps, {}> {
-
+    private static DEFAULT_DEVIATION = 10;
     private root: HTMLElement;
     private _rowHeight: number = 0;
     private lastScrollTop = 0;
@@ -120,6 +119,13 @@ export class PerformantScrollableList extends React.Component {
       }
     }
 
+    private get visibleRowsWithoutDeviation() {
+      return {
+        from: this.visibleRows.from + PerformantScrollableList.Provider.DEFAULT_DEVIATION,
+        to: this.visibleRows.to - PerformantScrollableList.Provider.DEFAULT_DEVIATION,
+      };
+    }
+
     private get rowHeight() {
       if (!this._rowHeight) {
         const {
@@ -150,12 +156,28 @@ export class PerformantScrollableList extends React.Component {
       const {
         scrollTop,
       } = this.root;
+
       const {
-        ChunkRowsCount,
         rebaseOnScrollRowCounts,
       } = this.props;
 
-      const rebaseDeviation = this.rowHeight * (rebaseOnScrollRowCounts || ChunkRowsCount);
+      const {
+        from,
+        to,
+      } = this.visibleRowsWithoutDeviation;
+
+      const visibleRowCount = to - from;
+
+      if (process.env.NODE_ENV !== "production") {
+        if (visibleRowCount < 0) {
+          console.error(
+            `PerformantScrollableList.Provider: visibleRowsWithoutDeviation exception.
+            Got: ${visibleRowCount}, where it should be >= 0`,
+          );
+        }
+      }
+
+      const rebaseDeviation = this.rowHeight * (rebaseOnScrollRowCounts || visibleRowCount);
 
       if (
         Math.abs(scrollTop - this.lastScrollTop) > rebaseDeviation
@@ -178,7 +200,6 @@ export class PerformantScrollableList extends React.Component {
         const {
           wrappedSelectorId,
           itemSelector,
-          ChunkRowsCount,
         } = this.props;
         const rows = document.querySelectorAll(`#${wrappedSelectorId} ${itemSelector}`);
         let from = null;
@@ -199,9 +220,18 @@ export class PerformantScrollableList extends React.Component {
           }
         }
 
+        const {
+          DEFAULT_DEVIATION,
+        } = PerformantScrollableList.Provider;
+
+        // All rows are visible
+        if (to === null) {
+          to = rows.length;
+        }
+
         return {
-          from: from - ChunkRowsCount,
-          to: to + ChunkRowsCount,
+          from: from - DEFAULT_DEVIATION,
+          to: to + DEFAULT_DEVIATION,
         };
       }
     }

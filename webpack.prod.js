@@ -3,7 +3,6 @@ var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
 	entry: './src/PerformantScrollableList.tsx',
-	devtool: 'nosources-source-map',
 	output: {
     filename: 'dist/index.js',
 	},

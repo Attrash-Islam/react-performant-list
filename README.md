@@ -42,7 +42,6 @@ import { PerformantScrollableList } from "react-performant-scrollable-list";
           <PerformantScrollableList.Provider
             wrappedSelectorId="myTable"
             itemSelector="tr"
-            ChunkRowsCount={10}
             render={({isVisibleRow}) => (
               <table
                 id="myTable"
@@ -97,8 +96,6 @@ interface IPerformantScrollableListProviderProps {
   wrappedSelectorId: string;
   // The item row selector (e.g. tr, li, .my-row-class, etc.)
   itemSelector: string;
-  // Chunk count to be updated [Mainly the visible chunk]
-  ChunkRowsCount: number;
   // Rebase on scroll row counts - When freezing the values user may watch older values that not make since (e.g. sorting)
   // while scrolling up for the already rendered values, so once he pass a speicfic count of rows the Proiver will
   // forceUpdate the values to fetch the last correct value kept in the inner state
