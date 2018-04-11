@@ -91,7 +91,7 @@ class Hello extends React.Component<{}, {
             height: "50%",
           }}
         >
-          <h1 style={{ marginTop: "120px"}}>Test</h1>
+          <h1>Test</h1>
           <PerformantScrollableList.Provider
             wrappedSelectorId="myTable"
             itemSelector="tr"

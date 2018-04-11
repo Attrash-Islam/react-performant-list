@@ -4,7 +4,7 @@ module.exports = {
 	entry: './app.tsx',
 	devtool: 'inline-source-map',
 	output: {
-    filename: 'index.js',
+    filename: 'dist/index.js',
 	},
 	resolve: {
     extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
