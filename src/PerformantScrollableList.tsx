@@ -21,7 +21,6 @@ interface IVisibleRowsBoundaries {
 export class PerformantScrollableList extends React.Component {
   public static Provider = class extends React.Component<IPerformantScrollableListProviderProps, {}> {
     private static DEFAULT_DEVIATION = 10;
-    private forceUpdateTimerAgent: number;
     private root: HTMLElement;
     private _rowHeight: number = 0;
     private lastScrollTop = 0;
@@ -73,7 +72,7 @@ export class PerformantScrollableList extends React.Component {
           console.error("PerformantScrollableList.Provider: Can't find the scrollable parent");
         }
 
-        this.visibleRows = this.getVisibleRowsIndexes();
+        this.visibleRows = this.getVisibleRowsIndexes(null);
         if (process.env.NODE_ENV !== "production") {
           console.log(
             `%c PerformantScrollableList.Provider: calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`,
@@ -106,17 +105,10 @@ export class PerformantScrollableList extends React.Component {
     }
 
     public componentDidUpdate() {
-      if (this.forceUpdateTimerAgent) {
-        window.clearTimeout(this.forceUpdateTimerAgent);
-        this.forceUpdateTimerAgent = null;
-      }
-
       const oldVisibleRows = {...this.visibleRows};
-      this.visibleRows = this.getVisibleRowsIndexes();
+      this.visibleRows = this.getVisibleRowsIndexes(oldVisibleRows);
       if (process.env.NODE_ENV !== "production") {
-        const stringifyOldVisible = JSON.stringify(oldVisibleRows);
-        const stringifyNewVisible = JSON.stringify(this.visibleRows);
-        if (stringifyOldVisible !== stringifyNewVisible) {
+        if (this.isVisibleRowBoundariesChanged(this.visibleRows, oldVisibleRows)) {
           console.log(
             `%c PerformantScrollableList.Provider: NEW Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`,
             "color: #00aa4f",
@@ -124,6 +116,9 @@ export class PerformantScrollableList extends React.Component {
         }
       }
     }
+
+    private isVisibleRowBoundariesChanged = (o1: IVisibleRowsBoundaries, o2: IVisibleRowsBoundaries) =>
+      o1.from !== o2.from || o1.to !== o2.to
 
     private get visibleRowsWithoutDeviation() {
       return {
@@ -189,15 +184,24 @@ export class PerformantScrollableList extends React.Component {
         Math.abs(scrollTop - this.lastScrollTop) > rebaseDeviation
       ) {
         this.lastScrollTop = scrollTop;
-        this.forceUpdateTimerAgent = window.setTimeout(() => {
-          this.forceUpdate();
-        }, 50);
+        this.forceUpdate();
       }
     }
 
-    private throttledOnScroll = _throttle(this.onScroll, 100);
+    private throttledOnScroll = _throttle(this.onScroll, 30);
 
-    private getVisibleRowsIndexes = (): IVisibleRowsBoundaries => {
+    private getVisibleRowsIndexes = (oldVisibleRows: IVisibleRowsBoundaries): IVisibleRowsBoundaries => {
+      let searchStep = 1;
+
+      if (oldVisibleRows !== null) {
+        const normalizedOldVisible = {
+          from: oldVisibleRows.from + PerformantScrollableList.Provider.DEFAULT_DEVIATION,
+          to: oldVisibleRows.to - PerformantScrollableList.Provider.DEFAULT_DEVIATION,
+        };
+
+        const normalizedVisibleRowCount = normalizedOldVisible.to - normalizedOldVisible.from;
+        searchStep = normalizedVisibleRowCount - 1;
+      }
 
       if (!this.rowHeight || !this.root) {
         return {
@@ -211,7 +215,7 @@ export class PerformantScrollableList extends React.Component {
         const rows = document.querySelectorAll(`#${wrappedSelectorId} ${itemSelector}`);
         let from = null;
         let to = null;
-        for (let i = 0; i < rows.length; i++) {
+        for (let i = 0; i < rows.length; i += searchStep) {
           let row = rows[i];
           let position = row.getBoundingClientRect().top + this.rowHeight;
           if (position >= 0 && position <= this.root.clientHeight) {

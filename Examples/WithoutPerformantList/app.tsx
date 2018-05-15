@@ -93,6 +93,7 @@ class Hello extends React.Component<{}, {
           style={{
             overflowY: "scroll",
             height: "50%",
+            transform : "translateZ(0)",
           }}
         >
           <h1>Test</h1>
