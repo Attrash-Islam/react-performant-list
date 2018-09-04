@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "react-performant-list",
   "scripts": {
-    "build": "webpack --config webpack.prod.js --output-library-target=\"umd\"",
+    "build": "webpack --config webpack.config.js --output-library-target=\"umd\"",
     "build:watch": "webpack --config webpack.config.js --output-library-target=\"umd\" --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

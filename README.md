@@ -1,4 +1,4 @@
-# react-performant-scrollable-list [Not ready for production]
+# react-performant-scrollable-list
 
 This plugin is implementing a "windowing" technique on list items (rows) based on very thin layer that can be added easily to any project.
 
