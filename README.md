@@ -16,11 +16,11 @@ Seems like having that much of components into the React reconciliation is makin
 - Reduced the processing time fair enough and raised the performance
 
 # Performance Benchmarks
-### Without PerformantList including 180 rows in total with 4x slower CPU
-<img src="https://github.com/Attrash-Islam/assets/raw/master/WithoutPerformant_4X_slowerCPU_180_rows.png" />
+### Without PerformantList including (80) rows in total with X4 slower CPU
+<img src="https://github.com/Attrash-Islam/assets/raw/master/withoutPerformantList_80_rows_4x_slowerCPU.png" />
 
-### With PerformantList including 580 rows in total with 4x slower CPU
-<img src="https://github.com/Attrash-Islam/assets/raw/master/WithPerformantList_4x_slowerCPU_580_rows.png" />
+### With PerformantList including 360 rows in total with X4 slower CPU
+<img src="https://github.com/Attrash-Islam/assets/raw/master/WithPerformantList_360_rows_4x_slowerCPU.png" />
 
 # Install
 ```js
