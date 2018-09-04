@@ -73,12 +73,6 @@ export class PerformantScrollableList extends React.Component {
         }
 
         this.visibleRows = this.getVisibleRowsIndexes();
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            `%c PerformantScrollableList.Provider: calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`,
-            "color: #00aa4f",
-          );
-        }
       }, 0);
     }
 
@@ -107,16 +101,6 @@ export class PerformantScrollableList extends React.Component {
     public componentDidUpdate() {
       const oldVisibleRows = {...this.visibleRows};
       this.visibleRows = this.getVisibleRowsIndexes();
-      if (process.env.NODE_ENV !== "production") {
-        const stringifyOldVisible = JSON.stringify(oldVisibleRows);
-        const stringifyNewVisible = JSON.stringify(this.visibleRows);
-        if (stringifyOldVisible !== stringifyNewVisible) {
-          console.log(
-            `%c PerformantScrollableList.Provider: NEW Calculated visibleRows is: ${JSON.stringify(this.visibleRows)}`,
-            "color: #00aa4f",
-          );
-        }
-      }
     }
 
     private get visibleRowsWithoutDeviation() {
@@ -135,17 +119,6 @@ export class PerformantScrollableList extends React.Component {
         const firstRow = document.querySelector(`#${wrappedSelectorId} ${itemSelector}`);
         if (firstRow) {
           this._rowHeight = firstRow.clientHeight;
-        }
-
-        if (process.env.NODE_ENV !== "production") {
-          if (!this._rowHeight) {
-            console.warn("PerformantScrollableList.Provider: didn't calculated yet the row height");
-          } else {
-            console.log(
-              `%c PerformantScrollableList.Provider: successfully calculated the row height. ${this._rowHeight}`,
-              "color: #00aa4f",
-            );
-          }
         }
       }
 
