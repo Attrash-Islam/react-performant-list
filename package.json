@@ -1,8 +1,7 @@
 {
   "name": "react-performant-scrollable-list",
-  "version": "1.0.4",
+  "version": "1.0.3",
   "description": "react-performant-scrollable-list",
-  "main": "./index.js",
   "scripts": {
     "build": "webpack --config webpack.config.js --output-library-target=\"umd\" && webpack --config webpack.prod.js --output-library-target=\"umd\"",
     "tslint": "tslint --fix -c tslint.json 'src/**/*.tsx'",
@@ -10,9 +9,6 @@
     "prepublish": "npm run validate-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "files": [
-    "dist/"
-  ],
   "author": "Islam Attrash <isattrash@gmail.com>",
   "license": "MIT",
   "dependencies": {
