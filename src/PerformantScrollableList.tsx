@@ -1,5 +1,4 @@
 import * as React from "react";
-import _throttle from "lodash-es/throttle";
 
 interface IPerformantScrollableListConsumerProps {
   isVisible: boolean;
@@ -13,25 +12,25 @@ interface IPerformantScrollableListProviderProps {
   getScrollableParent?(wrappedSelectorId: string): HTMLElement;
 }
 
-interface IVisibleRowsBoundaries {
-    from: number;
-    to: number;
-}
-
 export class PerformantScrollableList extends React.Component {
   public static Provider = class extends React.Component<IPerformantScrollableListProviderProps, {}> {
     private static DEFAULT_DEVIATION = 10;
-    private forceUpdateTimerAgent: number;
     private root: HTMLElement;
     private _rowHeight: number = 0;
     private lastScrollTop = 0;
     private safeScroll: number = 0;
-    private SHOW_ALL_ROWS: IVisibleRowsBoundaries = {
+    private SHOW_ALL_ROWS: {
+      from: number,
+      to: number,
+    } = {
       from: 0,
       to: Number.MAX_VALUE,
     };
 
-    private visibleRows: IVisibleRowsBoundaries = {...this.SHOW_ALL_ROWS};
+    private visibleRows: {
+      from: number,
+      to: number,
+    } = {...this.SHOW_ALL_ROWS};
 
     public componentDidMount() {
       setTimeout(() => {
@@ -68,7 +67,7 @@ export class PerformantScrollableList extends React.Component {
 
         if (root) {
           this.root = root;
-          this.root.addEventListener("scroll", this.throttledOnScroll);
+          this.root.addEventListener("scroll", this.onScroll);
         } else {
           console.error("PerformantScrollableList.Provider: Can't find the scrollable parent");
         }
@@ -101,16 +100,11 @@ export class PerformantScrollableList extends React.Component {
 
     public componentWillUnmount() {
       if (this.root) {
-        this.root.removeEventListener("scroll", this.throttledOnScroll);
+        this.root.removeEventListener("scroll", this.onScroll);
       }
     }
 
     public componentDidUpdate() {
-      if (this.forceUpdateTimerAgent) {
-        window.clearTimeout(this.forceUpdateTimerAgent);
-        this.forceUpdateTimerAgent = null;
-      }
-
       const oldVisibleRows = {...this.visibleRows};
       this.visibleRows = this.getVisibleRowsIndexes();
       if (process.env.NODE_ENV !== "production") {
@@ -189,15 +183,14 @@ export class PerformantScrollableList extends React.Component {
         Math.abs(scrollTop - this.lastScrollTop) > rebaseDeviation
       ) {
         this.lastScrollTop = scrollTop;
-        this.forceUpdateTimerAgent = window.setTimeout(() => {
-          this.forceUpdate();
-        }, 50);
+        this.forceUpdate();
       }
     }
 
-    private throttledOnScroll = _throttle(this.onScroll, 100);
-
-    private getVisibleRowsIndexes = (): IVisibleRowsBoundaries => {
+    private getVisibleRowsIndexes = (): {
+      from: number;
+      to: number;
+    } => {
 
       if (!this.rowHeight || !this.root) {
         return {

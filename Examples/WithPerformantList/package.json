@@ -9,9 +9,7 @@
   },
   "author": "Islam Attrash <isattrash@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "lodash-es": "4.17.10"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/react": "16.1.0",
     "@types/react-dom": "16.0.4",

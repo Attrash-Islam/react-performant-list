@@ -1,6 +1,5 @@
 import * as React from "react";
 import {render} from "react-dom";
-import _throttle from "lodash-es/throttle";
 import {PerformantScrollableList} from "../../src/PerformantScrollableList";
 
 const updateEveryInSecond = 5;
@@ -58,7 +57,13 @@ class Hello extends React.Component<{}, {
   private scrollableArea: HTMLDivElement = null;
 
   public componentDidMount() {
-    this.scrollableArea.addEventListener("scroll", this.throttledOnScroll);
+    this.scrollableArea.addEventListener("scroll", () => {
+      if (this.scrollableArea.scrollTop + window.innerHeight >= this.scrollableArea.scrollHeight) {
+        this.setState(prevState => ({
+          count: prevState.count + 20,
+        }));
+      }
+    });
 
     window.setInterval(() => {
       this.setState({
@@ -127,17 +132,6 @@ class Hello extends React.Component<{}, {
       )
     );
   }
-
-  private onScroll = () => {
-    if (this.scrollableArea.scrollTop + window.innerHeight >= this.scrollableArea.scrollHeight) {
-      this.setState(prevState => ({
-        count: prevState.count + 20,
-      }));
-    }
-  }
-
-  private throttledOnScroll = _throttle(this.onScroll, 100);
-
 }
 
 render(<Hello />, document.getElementById("root"));

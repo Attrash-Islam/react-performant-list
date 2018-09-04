@@ -11,7 +11,6 @@
     "jsx-boolean-value": false,
     "variable-name": false,
     "switch-default": true,
-    "member-ordering": false,
     "newline-before-return": true,
     "no-duplicate-imports": true,
     "no-require-imports": true,
